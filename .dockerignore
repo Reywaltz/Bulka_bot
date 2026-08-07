@@ -1,0 +1,11 @@
+.git
+.venv
+.env
+pgdata
+__pycache__/
+*.py[oc]
+.ruff_cache
+.claude
+migrations
+Dockerfile
+docker-compose.yml
