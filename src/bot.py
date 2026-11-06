@@ -1,6 +1,8 @@
 import logging
 from collections.abc import Awaitable, Callable, Iterable
+from datetime import time
 from html import escape
+from zoneinfo import ZoneInfo
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup, Update
 from telegram.constants import ParseMode
@@ -137,11 +139,23 @@ class Bot:
         raise ApplicationHandlerStop
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+        chat_id = update.effective_chat.id
+        name = f"daily-{chat_id}"
+
+        for job in context.job_queue.get_jobs_by_name(name):
+            job.schedule_removal()
+
+        notification_time = time(hour=20, minute=0, tzinfo=ZoneInfo("Europe/Moscow"))
+        context.job_queue.run_daily(self.daily_checkup, time=notification_time, chat_id=update.effective_chat.id)
+
         await context.bot.send_message(
             chat_id=update.effective_chat.id,
-            text="I'm a bot, please talk to me!",
+            text="Бот запущен!",
             reply_markup=default_markup,
         )
+
+    async def daily_checkup(self, context: ContextTypes.DEFAULT_TYPE):
+        await context.bot.send_message(chat_id=context.job.chat_id, text="Не забудь отметить дейлики🔔")
 
     async def get_current_tasks(
         self, update: Update, context: ContextTypes.DEFAULT_TYPE
