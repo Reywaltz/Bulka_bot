@@ -13,7 +13,6 @@ from telegram.ext import (
     CallbackQueryHandler,
     CommandHandler,
     ContextTypes,
-    JobQueue,
     MessageHandler,
     TypeHandler,
     filters,
@@ -154,7 +153,6 @@ class Bot:
             text="Бот запущен!",
             reply_markup=default_markup,
         )
-
 
     async def daily_checkup(self, context: ContextTypes.DEFAULT_TYPE):
         await context.bot.send_message(chat_id=context.job.chat_id, text="Не забудь отметить дейлики🔔")
